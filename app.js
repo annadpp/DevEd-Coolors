@@ -3,8 +3,14 @@ const colorDivs = document.querySelectorAll(".color")
 const generateBtn = document.querySelector(".generate")
 const sliders = document.querySelectorAll("input[type='range']")
 const currentHexes = document.querySelectorAll(".color h2")
+const popup = document.querySelector(".copy-container")
+const adjustBtn = document.querySelectorAll(".adjust")
+const closeAdjustments = document.querySelectorAll(".close-adjustment")
+const sliderContainers = document.querySelectorAll(".sliders")
+const lockBtn = document.querySelectorAll(".lock")
 
 let initialColors;
+generateBtn.addEventListener("click", randomColors)
 
 sliders.forEach(slider => {
     slider.addEventListener("input", hslControls)
@@ -16,7 +22,29 @@ colorDivs.forEach((div, i) => {
     })
 })
 
+currentHexes.forEach(hex => {
+    hex.addEventListener("click", () => {
+        copyToClipboard(hex)
+    })
+})
 
+popup.addEventListener("transitionend", () => {
+    const popupBox = popup.children[0]
+    popup.classList.remove("active")
+    popupBox.classList.remove("active")
+})
+
+adjustBtn.forEach((btn, i) => {
+    btn.addEventListener("click", () => {
+        openAdjustmentsPanel(i)
+    })
+})
+
+closeAdjustments.forEach((btn, i) => {
+    btn.addEventListener("click", () => {
+        closeAdjustmentsPanel(i)
+    })
+})
 
 //FUNCTIONS
 
@@ -56,6 +84,12 @@ function randomColors() {
 
     //Resets inputs
     resetInputs()
+
+    //Checks contrast in buttons -> uses loop in adjustBtn to add also lockBtn and applies to both
+    adjustBtn.forEach((btn, i) => {
+        checkTextContrast(initialColors[i], btn)
+        checkTextContrast(initialColors[i], lockBtn[i])
+    })
 }
 
 //Checks text contrast with Chroma JS comparing bg color & text color
@@ -156,5 +190,26 @@ function resetInputs() {
     })
 }
 
+function copyToClipboard(hex) {
+    const element = document.createElement("textarea")
+    element.value = hex.innerText
+    document.body.appendChild(element)
+    element.select();
+    navigator.clipboard.writeText(hex.innerText);
+    document.body.removeChild(element)
+
+    //Animation for popup
+    const popupBox = popup.children[0]
+    popup.classList.add("active")
+    popupBox.classList.add("active")
+}
+
+function openAdjustmentsPanel(i) {
+    sliderContainers[i].classList.toggle("active")
+}
+
+function closeAdjustmentsPanel(i) {
+    sliderContainers[i].classList.remove("active")
+}
 
 randomColors()
