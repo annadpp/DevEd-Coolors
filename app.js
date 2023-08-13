@@ -46,6 +46,12 @@ closeAdjustments.forEach((btn, i) => {
     })
 })
 
+lockBtn.forEach((btn, i) => {
+    btn.addEventListener("click", () => {
+        lockColor(i)
+    })
+})
+
 //FUNCTIONS
 
 //Generates random color with Chroma JS
@@ -56,31 +62,37 @@ function generateHex() {
 
 //Adds color to background + color name to div
 function randomColors() {
-    //Gets reference of base color
+    //Gets reference of base color -> we reset it every time randomColors is run
     initialColors = []
 
     colorDivs.forEach((div, i) => {
         const hexText = div.children[0]
         const randomColor = generateHex()
-        //Adds initial color to array for each different div
-        initialColors.push(chroma(randomColor).hex())
 
-    div.style.backgroundColor = randomColor
-    hexText.innerText = randomColor
+        if(div.classList.contains("locked")){
+            initialColors.push(hexText.innerHTML)
+            return
+        } else {
+            //Adds initial color to array for each different div
+            initialColors.push(chroma(randomColor).hex())
+        }
 
-    //Checks contrast
-    checkTextContrast(randomColor, hexText)
+        div.style.backgroundColor = randomColor
+        hexText.innerText = randomColor
 
-    //Initial colorize sliders
-    const color = chroma(randomColor)
-    const sliders = div.querySelectorAll(".sliders input")
-    const hue = sliders[0]
-    const brightness = sliders[1]
-    const saturation = sliders[2]
-    
-    //Colorizes sliders/input depending on other input values
-    colorizeSliders(color, hue, brightness, saturation);
-    })
+        //Checks contrast
+        checkTextContrast(randomColor, hexText)
+
+        //Initial colorize sliders
+        const color = chroma(randomColor)
+        const sliders = div.querySelectorAll(".sliders input")
+        const hue = sliders[0]
+        const brightness = sliders[1]
+        const saturation = sliders[2]
+        
+        //Colorizes sliders/input depending on other input values
+        colorizeSliders(color, hue, brightness, saturation);
+        })
 
     //Resets inputs
     resetInputs()
@@ -210,6 +222,12 @@ function openAdjustmentsPanel(i) {
 
 function closeAdjustmentsPanel(i) {
     sliderContainers[i].classList.remove("active")
+}
+
+function lockColor(i) {
+    colorDivs[i].classList.toggle("locked")
+    lockBtn[i].children[0].classList.toggle("fa-lock-open")
+    lockBtn[i].children[0].classList.toggle("fa-lock")
 }
 
 randomColors()
